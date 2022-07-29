@@ -1,0 +1,78 @@
+version: "3.8"
+services:
+
+  akaunting-web:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - php
+      - mysqlserver
+    links:
+      - php
+    restart: always
+    volumes:
+      - ./conf/app.conf:/etc/nginx/conf.d/app.conf
+      - ./app:/var/www/html
+
+
+  akaunting-php:
+    container_name: akaunting
+    build:
+      dockerfile: fpm.Dockerfile
+      context: .
+    volumes:
+      - ./akaunting-data:/var/www/html
+    restart: unless-stopped
+    env_file:
+      - env/.env
+    environment:
+      - AKAUNTING_SETUP
+    depends_on:
+      - akaunting-db
+
+
+  akaunting-db:
+    #build: mysql
+    image: mysql:8.0
+    command: [ "--default-authentication-plugin=mysql_native_password" ]
+    ports:
+      - "3306:3306"
+    restart: always
+    env_file:
+      - env/.env
+    environment:
+      MYSQL_DATABASE
+      MYSQL_USER
+      MYSQL_PASSWORD
+    volumes:
+      - ./akaunting-db:/var/lib/mysql
+
+
+
+  akaunting-update:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --cleanup akaunting akaunting-db
+
+
+  akaunting-pma:
+    image: phpmyadmin:apache
+    restart: always
+    ports:
+      - "8082:80"
+    environment:
+      - PMA_ARBITRARY=1
+    depends_on:
+      - mysqlserver
+    links:
+      - mysqlserver
+
+
+
+volumes:
+  akaunting-data:
+  akaunting-modules:
+  akaunting-db:
