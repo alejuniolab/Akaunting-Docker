@@ -14,7 +14,7 @@ services:
     restart: always
     volumes:
       - ./conf/app.conf:/etc/nginx/conf.d/app.conf
-      - ./app:/var/www/html
+      - ./akaunting-data:/var/www/html
 
 
   akaunting-php:
