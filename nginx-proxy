@@ -1,0 +1,8 @@
+mkdir -p docker/nginx-proxy-manager
+cd docker/nginx-proxy-manager
+curl https://gitlab.com/bmcgonag/docker_installs/-/raw/main/docker_compose.nginx_proxy_manager.yml -o docker-compose.yml
+docker-compose up -d
+
+// Credenciais Default do Nginx Manager
+username: admin@example.com
+password: changeme
